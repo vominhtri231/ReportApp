@@ -28,3 +28,10 @@ function saveForm(savingData, workPlace) {
   const savingSheet = savingSpreadSheet.getSheetByName(savingDestination["sheet name"]);
   savingSheet.appendRow(savingData);
 }
+
+function getSendToSlackFields() {
+  const spreadSheet = SpreadsheetApp.openById(formDefinitionSheetId);
+  const fieldSheet = spreadSheet.getSheetByName("send to slack");
+  const fields = getAllData(fieldSheet.getDataRange().getValues());
+  return fields.filter(field => field["Send to slack"]).map(field => field.name);
+}

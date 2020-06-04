@@ -14,21 +14,14 @@ function onFormSubmit() {
   const editResponseUrl = lastFormResponse.getEditResponseUrl();
   const itemResponses = getItemResponses(lastFormResponse);
 
-  const fields = itemResponses.map(itemResponse => ({
-    title: itemResponse.title,
-    value: itemResponse.response,
-    short: true
-  }));
-  const savingData = [...itemResponses.map(itemResponse => itemResponse.response), editResponseUrl];
-  const workStation = itemResponses.find(itemResponse => itemResponse.title === "該当事業所").response;
-
   const user = getUser(respondentEmail);
-
   sendToSlack({
-    fields: fields,
+    fields: getSlackFields(itemResponses),
     mentions: [user.slackId],
   });
 
+  const savingData = [...itemResponses.map(itemResponse => itemResponse.response), editResponseUrl];
+  const workStation = itemResponses.find(itemResponse => itemResponse.title === "該当事業所").response;
   saveForm(savingData, workStation);
 }
 
@@ -40,4 +33,15 @@ function getItemResponses(lastFormResponse) {
       response: itemResponse.getResponse()
     }
   });
+}
+
+function getSlackFields(itemResponses) {
+  const sendToSlackFields = getSendToSlackFields();
+  return itemResponses
+    .filter(itemResponse => sendToSlackFields.includes(itemResponse.title))
+    .map(itemResponse => ({
+      title: itemResponse.title,
+      value: itemResponse.response,
+      short: true
+    }));
 }
